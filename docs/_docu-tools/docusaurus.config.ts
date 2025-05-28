@@ -13,12 +13,12 @@ const config: Config = {
 	url: 'https://developer.woocommerce.com',
 	// Set the /<baseUrl>/ pathname under which your site is served
 	// For GitHub pages deployment, it is often '/<projectName>/'
-	baseUrl: '/docs/',
+	baseUrl: '/',
 
 	// GitHub pages deployment config.
 	// If you aren't using GitHub pages, you don't need these.
 	organizationName: 'woocommerce', // Usually your GitHub org/user name.
-	projectName: 'woocommerce', // Usually your repo name.
+	projectName: 'woo-docs-build', // Usually your repo name.
 
 	onBrokenLinks: 'throw',
 	onBrokenMarkdownLinks: 'warn',
@@ -70,7 +70,7 @@ const config: Config = {
 				alt: 'WooCommerce developer docs',
 				src: 'img/woo-dev-site-logo.svg',
 				// srcDark: 'img/woo-dev-site-logo-dark.svg',
-				href: '/docs',
+				href: '/',
 			},
 			items: [
 				{          
