@@ -57,7 +57,7 @@ jobs:
         with:
           token: ${{ secrets.DEPLOY_PAT }}
           path: /tmp/target-repo
-          commit: "Update documentation build"
+          commit-message: "Update documentation build"
           title: "Update documentation build"
           body: "This PR contains the latest documentation build updates."
           branch: ${{ steps.deploy.outputs.branch_name }}
