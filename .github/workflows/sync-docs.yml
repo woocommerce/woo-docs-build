@@ -21,8 +21,14 @@ jobs:
 
       - name: Copy docs folder contents into woo-docs-build root
         run: |
-          echo "Clearing repo except .git..."
-          find . -mindepth 1 ! -regex '^./\.git\(/.*\)?' -delete
+          echo "Clearing repo except .git and .github/workflows..."
+          find . -mindepth 1 \
+            ! -path './.git' \
+            ! -path './.git/*' \
+            ! -path './.github' \
+            ! -path './.github/workflows' \
+            ! -path './.github/workflows/*' \
+            -exec rm -rf {} +
       
           echo "Copying from source/docs/ to repo root..."
           if [ -d "/tmp/source/docs" ]; then
