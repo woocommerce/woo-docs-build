@@ -1,0 +1,29 @@
+name: Sync WooCommerce Docs
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Runs hourly
+  workflow_dispatch:      # Allows manual triggering
+
+jobs:
+  sync-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone source repo
+        run: |
+          git clone --depth=1 --branch=trunk https://github.com/woocommerce/woocommerce.git source
+          mkdir -p temp-docs
+          cp -r source/docs/* temp-docs/
+
+      - name: Checkout destination repo
+        uses: actions/checkout@v3
+
+      - name: Copy docs and commit
+        run: |
+          rsync -av --delete temp-docs/ ./  # Or choose a subdir if not root
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git diff --quiet && git diff --staged --quiet || git commit -m "Sync docs from woocommerce trunk"
+          git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/woocommerce/woo-docs-build.git HEAD:main
