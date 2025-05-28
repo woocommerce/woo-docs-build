@@ -1,0 +1,52 @@
+
+name: Deploy synced docs
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # every hour
+  workflow_dispatch:
+
+jobs:
+  sync-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout woo-docs-build repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Clone woocommerce repo (source)
+        run: |
+          git clone --depth=1 --branch=docusaurus-docs-prep https://github.com/woocommerce/woocommerce.git /tmp/source
+          ls -la /tmp/source/docs
+
+      - name: Copy docs folder contents into woo-docs-build root
+        run: |
+          echo "Clearing repo except .git..."
+          find . -mindepth 1 ! -regex '^./\.git\(/.*\)?' -delete
+      
+          echo "Copying from source/docs/ to repo root..."
+          if [ -d "/tmp/source/docs" ]; then
+            cp -a /tmp/source/docs/. ./
+          else
+            echo "⚠️ /tmp/source/docs does not exist or is empty"
+            exit 1
+          fi
+      
+          echo "Post-copy file list:"
+          find . -not -path './.git*'
+
+      - name: Check for changes
+        run: |
+          git status
+          git diff --stat
+    
+      - name: Commit and push changes
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git diff --quiet && git diff --staged --quiet || git commit -m "Sync docs from woocommerce trunk"
+          git push --force https://x-access-token:${GH_PAT}@github.com/woocommerce/woo-docs-build.git HEAD:main
