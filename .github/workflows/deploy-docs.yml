@@ -30,14 +30,15 @@ jobs:
         id: deploy
         run: |
             BRANCH_NAME="docs-build-$(date +'%Y%m%d-%H%M%S')"
-            echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
             TARGET_REPO="wpcomvip/woocommerce-woo-docs-multi-com.git"
             
             git clone https://x-access-token:${DEPLOY_PAT}@github.com/${TARGET_REPO} /tmp/target-repo
             cd /tmp/target-repo
             
             git checkout develop
-            git pull
+            git pull origin develop
+            
+            # Create and switch to new branch
             git checkout -b $BRANCH_NAME
             
             git config --global user.email "github-actions@github.com"
@@ -53,7 +54,7 @@ jobs:
             DEPLOY_PAT: ${{ secrets.DEPLOY_PAT }}
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.DEPLOY_PAT }}
           path: /tmp/target-repo
@@ -62,4 +63,5 @@ jobs:
           body: "This PR contains the latest documentation build updates."
           branch: ${{ steps.deploy.outputs.branch_name }}
           base: develop
+          delete-branch: true
           reviewers: piinthecloud
