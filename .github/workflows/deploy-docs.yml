@@ -14,6 +14,11 @@ jobs:
         run: |
           git clone --depth=1 --branch=docusaurus-docs-prep https://github.com/woocommerce/woocommerce.git /tmp/source
           ls -la /tmp/source/docs
+      
+      - name: Copy source docs to workspace
+        run: |
+          mkdir -p docs
+          cp -r /tmp/source/docs/* docs/
 
       - name: Install dependencies
         working-directory: docs/_docu-tools
