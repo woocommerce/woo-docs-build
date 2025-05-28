@@ -14,11 +14,10 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-
       - name: Clone woocommerce repo (source)
         run: |
-          git clone --depth=1 --branch=trunk https://github.com/woocommerce/woocommerce.git source
-          ls -la source/docs
+          git clone --depth=1 --branch=trunk https://github.com/woocommerce/woocommerce.git /tmp/source
+          ls -la /tmp/source/docs
 
       - name: Copy docs folder contents into woo-docs-build root
         run: |
@@ -27,9 +26,9 @@ jobs:
       
           echo "Copying from source/docs/ to repo root..."
           if [ -d "source/docs" ]; then
-            cp -a source/docs/. ./
+            cp -a /tmp/source/docs/. ./
           else
-            echo "⚠️ source/docs does not exist or is empty"
+            echo "⚠️ tmp/source/docs does not exist or is empty"
             exit 1
           fi
       
