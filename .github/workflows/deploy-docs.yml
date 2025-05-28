@@ -32,9 +32,11 @@ jobs:
             BRANCH_NAME="docs-build-$(date +'%Y%m%d-%H%M%S')"
             TARGET_REPO="wpcomvip/woocommerce-woo-docs-multi-com.git"
             
-            git clone https://x-access-token:${GH_PAT}@github.com/${TARGET_REPO} /tmp/target-repo
+            git clone https://x-access-token:${DEPLOY_PAT}@github.com/${TARGET_REPO} /tmp/target-repo
             cd /tmp/target-repo
             
+            git checkout develop
+            git pull
             git checkout -b $BRANCH_NAME
             
             mkdir -p plugins/docu-loader/docs-build
@@ -44,4 +46,4 @@ jobs:
             git commit -m "Update documentation build from $(date)"
             git push origin $BRANCH_NAME
         env:
-            GH_PAT: ${{ secrets.GH_PAT }}
+            DEPLOY_PAT: ${{ secrets.DEPLOY_PAT }}
