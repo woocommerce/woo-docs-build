@@ -13,7 +13,7 @@ const config: Config = {
 	url: 'https://woocommmerce.github.io',
 	// Set the /<baseUrl>/ pathname under which your site is served
 	// For GitHub pages deployment, it is often '/<projectName>/'
-	baseUrl: '/docs/',
+	baseUrl: '/woo-docs-build/',
 
 	// GitHub pages deployment config.
 	// If you aren't using GitHub pages, you don't need these.
@@ -22,6 +22,9 @@ const config: Config = {
 
 	onBrokenLinks: 'throw',
 	onBrokenMarkdownLinks: 'warn',
+
+	// Add trailing slash to all URLs
+	trailingSlash: true,
 
 	// Even if you don't use internationalization, you can use this field to set
 	// useful metadata like html lang. For example, if your site is Chinese, you
@@ -45,7 +48,7 @@ const config: Config = {
 					// Remove this to remove the "edit this page" links.
 					editUrl:
 						'https://github.com/woocommerce/woocommerce/tree/trunk/docs/docs/',
-					routeBasePath: '/',
+					routeBasePath: '/docs/',
 
 					// Custom sidebar filter to remove some items from the docs sidebar.
 					async sidebarItemsGenerator({defaultSidebarItemsGenerator, ...args}) {					
@@ -69,8 +72,8 @@ const config: Config = {
 			logo: {
 				alt: 'WooCommerce developer docs',
 				src: 'img/woo-dev-site-logo.svg',
-				// srcDark: 'img/woo-dev-site-logo-dark.svg',
-				href: '/',
+				srcDark: 'img/woo-dev-site-logo-dark.svg',
+				href: '/woo-docs-build/docs/',
 			},
 			items: [
 				{          
@@ -150,7 +153,7 @@ const config: Config = {
 					],
 				},
 				{
-					title: 'MORE',
+					title: 'MORE', 	
 					items: [
 						{
 							label: 'Woo Developer Blog',
