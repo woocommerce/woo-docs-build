@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0
       - name: Clone woocommerce repo (source)
         run: |
-          git clone --depth=1 --branch=trunk https://github.com/woocommerce/woocommerce.git /tmp/source
+          git clone --depth=1 --branch=docusaurus-docs-prep https://github.com/woocommerce/woocommerce.git /tmp/source
           ls -la /tmp/source/docs
 
       - name: Copy docs folder contents into woo-docs-build root
@@ -54,4 +54,4 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .
           git diff --quiet && git diff --staged --quiet || git commit -m "Sync docs from woocommerce trunk"
-          git push --force https://x-access-token:${GH_PAT}@github.com/woocommerce/woo-docs-build.git HEAD:main
+          git push --force https://x-access-token:${GH_PAT}@github.com/woocommerce/woo-docs-build.git HEAD:trunk
