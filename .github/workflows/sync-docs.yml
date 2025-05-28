@@ -22,9 +22,12 @@ jobs:
 
       - name: Copy docs folder contents into woo-docs-build root
         run: |
-          rm -rf ./*    # clear destination repo root
+          find . -mindepth 1 ! -regex '^./\.git\(/.*\)?' -delete
           if [ -d "source/docs" ]; then cp -a source/docs/. ./; else echo "No docs found to copy"; fi
 
+      - name: Check for changes
+        run: |
+          git status
       - name: Commit and push changes
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
