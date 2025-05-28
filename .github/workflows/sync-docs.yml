@@ -21,7 +21,8 @@ jobs:
 
       - name: Copy docs folder contents into woo-docs-build root
         run: |
-          rsync -av --delete source/docs/ ./
+          rm -rf ./*    # clear destination repo root
+          cp -r source/docs/* ./
 
       - name: Commit and push changes
         env:
