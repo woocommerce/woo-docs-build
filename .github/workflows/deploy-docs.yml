@@ -27,17 +27,21 @@ jobs:
       - name: Build documentation
         working-directory: docs/_docu-tools
         run: npm run build
-      
-      - name: Commit docs
-        working-directory: docs/_docu-tools/build
+      - name: Deploy docs to target repo
         run: |
-          BRANCH_NAME="docs-build-$(date +'%Y%m%d-%H%M%S')"
-          git init
-          git remote add origin https://x-access-token:${GH_PAT}@github.com/wpcomvip/woocommerce-woo-docs-multi-com.git
-          git fetch origin develop
-          git checkout -b $BRANCH_NAME
-          cd plugins/docu-loader/docs-build
-          cp -r */ plugins/docu-loader/docs-build/
-          git add plugins/docu-loader/docs-build/
-          git commit -m "Update documentation build"
-          git push origin $BRANCH_NAME
+            BRANCH_NAME="docs-build-$(date +'%Y%m%d-%H%M%S')"
+            TARGET_REPO="wpcomvip/woocommerce-woo-docs-multi-com.git"
+            
+            git clone https://x-access-token:${GH_PAT}@github.com/${TARGET_REPO} /tmp/target-repo
+            cd /tmp/target-repo
+            
+            git checkout -b $BRANCH_NAME
+            
+            mkdir -p plugins/docu-loader/docs-build
+            cp -r ${GITHUB_WORKSPACE}/docs/_docu-tools/build/* plugins/docu-loader/docs-build/
+            
+            git add plugins/docu-loader/docs-build/
+            git commit -m "Update documentation build from $(date)"
+            git push origin $BRANCH_NAME
+        env:
+            GH_PAT: ${{ secrets.GH_PAT }}
