@@ -49,3 +49,4 @@ jobs:
             gh pr create --title "Update documentation build" --body "This PR contains the latest documentation build updates." --reviewer piinthecloud
         env:
             DEPLOY_PAT: ${{ secrets.DEPLOY_PAT }}
+            GH_TOKEN: ${{ secrets.DEPLOY_PAT}}
