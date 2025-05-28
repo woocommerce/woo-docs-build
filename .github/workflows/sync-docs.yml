@@ -1,8 +1,8 @@
 name: Sync Docs Folder to woo-docs-build
 
 on:
-  schedule:
-    - cron: '0 * * * *'  # every hour
+  #schedule:
+    #- cron: '0 * * * *'  # every hour
   workflow_dispatch:
 
 jobs:
