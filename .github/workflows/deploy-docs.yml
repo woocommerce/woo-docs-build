@@ -1,4 +1,3 @@
-
 name: Deploy synced docs
 
 on:
@@ -38,6 +37,10 @@ jobs:
             git checkout develop
             git pull
             git checkout -b $BRANCH_NAME
+            
+            # Configure Git identity
+            git config --global user.email "github-actions@github.com"
+            git config --global user.name "GitHub Actions"
             
             mkdir -p plugins/docu-loader/docs-build
             cp -r ${GITHUB_WORKSPACE}/docs/_docu-tools/build/* plugins/docu-loader/docs-build/
