@@ -23,7 +23,7 @@ jobs:
       - name: Copy docs folder contents into woo-docs-build root
         run: |
           rm -rf ./*    # clear destination repo root
-          cp -r source/docs/* ./
+          if [ -d "source/docs" ]; then cp -a source/docs/. ./; else echo "No docs found to copy"; fi
 
       - name: Commit and push changes
         env:
