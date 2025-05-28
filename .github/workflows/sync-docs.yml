@@ -18,6 +18,7 @@ jobs:
       - name: Clone woocommerce repo (source)
         run: |
           git clone --depth=1 --branch=trunk https://github.com/woocommerce/woocommerce.git source
+          ls -la source/docs
 
       - name: Copy docs folder contents into woo-docs-build root
         run: |
