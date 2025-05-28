@@ -14,19 +14,12 @@ jobs:
         run: |
           git clone --depth=1 --branch=docusaurus-docs-prep https://github.com/woocommerce/woocommerce.git /tmp/source
           ls -la /tmp/source/docs
-      
-      - name: Copy source docs to workspace
+
+      - name: Install dependencies and build docs
+        working-directory: /tmp/source/docs/_docu-tools
         run: |
-          mkdir -p docs
-          cp -r /tmp/source/docs/* docs/
-
-      - name: Install dependencies
-        working-directory: docs/_docu-tools
-        run: npm ci
-
-      - name: Build documentation
-        working-directory: docs/_docu-tools
-        run: npm run build
+          npm install
+          npm run build
 
       - name: Deploy docs to target repo
         id: deploy
@@ -47,13 +40,12 @@ jobs:
             git config --global user.name "GitHub Actions"
             
             mkdir -p plugins/docu-loader/docs-build
-            cp -r ${GITHUB_WORKSPACE}/docs/_docu-tools/build/* plugins/docu-loader/docs-build/
+            cp -r /tmp/source/docs/_docu-tools/build/* plugins/docu-loader/docs-build/
             
             git add plugins/docu-loader/docs-build/
             git commit -m "Update documentation build from $(date)"
             git push origin $BRANCH_NAME
 
-             gh pr create --title "Update documentation build" --body "This PR contains the latest documentation build updates." --reviewer piinthecloud
+            gh pr create --title "Update documentation build" --body "This PR contains the latest documentation build updates." --reviewer piinthecloud
         env:
             DEPLOY_PAT: ${{ secrets.DEPLOY_PAT }}
-
