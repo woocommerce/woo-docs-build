@@ -10,10 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout woo-docs-build repo
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       - name: Clone woocommerce repo (source)
         run: |
           git clone --depth=1 --branch=docusaurus-docs-prep https://github.com/woocommerce/woocommerce.git /tmp/source
@@ -26,6 +22,7 @@ jobs:
       - name: Build documentation
         working-directory: docs/_docu-tools
         run: npm run build
+
       - name: Deploy docs to target repo
         id: deploy
         run: |
@@ -50,18 +47,8 @@ jobs:
             git add plugins/docu-loader/docs-build/
             git commit -m "Update documentation build from $(date)"
             git push origin $BRANCH_NAME
+
+             gh pr create --title "Update documentation build" --body "This PR contains the latest documentation build updates." --reviewer piinthecloud
         env:
             DEPLOY_PAT: ${{ secrets.DEPLOY_PAT }}
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.DEPLOY_PAT }}
-          path: /tmp/target-repo
-          commit-message: "Update documentation build"
-          title: "Update documentation build"
-          body: "This PR contains the latest documentation build updates."
-          branch: ${{ steps.deploy.outputs.branch_name }}
-          base: develop
-          delete-branch: true
-          reviewers: piinthecloud
