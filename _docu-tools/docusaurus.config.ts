@@ -18,7 +18,7 @@ const config: Config = {
 	// GitHub pages deployment config.
 	// If you aren't using GitHub pages, you don't need these.
 	organizationName: 'woocommerce', // Usually your GitHub org/user name.
-	projectName: 'woo-docs-build', // Usually your repo name.
+	projectName: 'woocommerce', // Usually your repo name.
 
 	onBrokenLinks: 'throw',
 	onBrokenMarkdownLinks: 'warn',
@@ -186,9 +186,15 @@ const config: Config = {
 		},
 		prism: {
 			theme: prismThemes.github,
-			darkTheme: prismThemes.dracula,
+			// darkTheme: prismThemes.dracula,
 			additionalLanguages: [ 'php' ],
 		},
+		colorMode: {
+			defaultMode: 'light',
+			disableSwitch: true,
+			respectPrefersColorScheme: false,
+		},
+
 		// algolia: {
 		// 	// The application ID provided by Algolia
 		// 	appId: 'DGCTEY3UZR',
