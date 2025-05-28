@@ -25,7 +25,7 @@ jobs:
           find . -mindepth 1 ! -regex '^./\.git\(/.*\)?' -delete
       
           echo "Copying from source/docs/ to repo root..."
-          if [ -d "source/docs" ]; then
+          if [ -d "tmp/source/docs" ]; then
             cp -a /tmp/source/docs/. ./
           else
             echo "⚠️ tmp/source/docs does not exist or is empty"
