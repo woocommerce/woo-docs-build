@@ -18,7 +18,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: docs/_docu-tools
-        run: npm ci
+        run: npm install
 
       - name: Build documentation
         working-directory: docs/_docu-tools
