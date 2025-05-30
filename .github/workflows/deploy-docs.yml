@@ -19,7 +19,7 @@ jobs:
         working-directory: /tmp/source/docs/_docu-tools
         run: |
           npm install
-          npm run build
+          npm run deploy-build
 
       - name: Deploy docs to target repo
         id: deploy
