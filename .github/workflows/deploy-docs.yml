@@ -29,8 +29,8 @@ jobs:
             git clone https://x-access-token:${DEPLOY_PAT}@github.com/${TARGET_REPO} /tmp/target-repo
             cd /tmp/target-repo
             
-            git checkout develop
-            git pull origin develop
+            git checkout production
+            git pull origin production
             
             # Create and switch to new branch
             git checkout -b $BRANCH_NAME
