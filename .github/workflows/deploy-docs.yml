@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Clone woocommerce repo (source)
         run: |
-          git clone --depth=1 --branch=trunk https://github.com/woocommerce/woocommerce.git /tmp/source
+          git clone --depth=0 --branch=trunk https://github.com/woocommerce/woocommerce.git /tmp/source
           ls -la /tmp/source/docs
 
       - name: Install dependencies and build docs
