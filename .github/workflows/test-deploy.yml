@@ -50,6 +50,21 @@ jobs:
             echo "No documentation changes detected. Skipping commit and PR."
             exit 0
           else
+            # Get list of changed files (staged)
+            CHANGED_FILES=$(git diff --name-only --cached)
+            
+            # URL-encoded line breaks (%0A) for GitHub CLI PR body
+            PR_BODY="This PR contains the latest documentation build updates.%0A%0A**Changed files:**%0A"
+            
+            # Append each file to the PR body
+            while IFS= read -r file; do
+              PR_BODY+="%0A- \`${file}\`"
+            done <<< "$CHANGED_FILES"
+            
+            # Create pull request with list of changed files
+            gh pr create --title "Update documentation build" \
+                         --body "$PR_BODY" \
+                         --reviewer piinthecloud
             git commit -m "Update documentation build from $(date)"
             git push origin $BRANCH_NAME
 
