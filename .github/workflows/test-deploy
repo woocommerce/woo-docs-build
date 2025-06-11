@@ -1,43 +1,65 @@
-- name: Deploy docs to target repo
-  id: deploy
-  run: |
-      BRANCH_NAME="docs-build-$(date +'%Y%m%d-%H%M%S')"
+name: Deploy synced docs
 
-      # Clone target repo
-      git clone https://x-access-token:${DEPLOY_PAT}@github.com/${TARGET_REPO} /tmp/target-repo
-      cd /tmp/target-repo
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
 
-      # Checkout production and update
-      git checkout production
-      git pull origin production
+jobs:
+  sync-docs:
+    runs-on: ubuntu-latest
 
-      # Create new branch
-      git checkout -b $BRANCH_NAME
+    steps:
+      - name: Clone woocommerce repo (source)
+        run: |
+          git clone --branch=trunk https://github.com/woocommerce/woocommerce.git /tmp/source
+          ls -la /tmp/source/docs
 
-      # Git identity for commit
-      git config --global user.email "github-actions@github.com"
-      git config --global user.name "GitHub Actions"
+      - name: Install dependencies and build docs
+        working-directory: /tmp/source/docs/_docu-tools
+        run: |
+          npm install
+          npm run deploy-build
 
-      # Copy built docs
-      mkdir -p plugins/docu-loader/docs-build
-      cp -r /tmp/source/docs/_docu-tools/build/* plugins/docu-loader/docs-build/
+      - name: Deploy docs to target repo
+        run: |
+          BRANCH_NAME="docs-build-$(date +'%Y%m%d-%H%M%S')"
 
-      # Stage changes
-      git add plugins/docu-loader/docs-build/
+          # Clone target repo
+          git clone https://x-access-token:${DEPLOY_PAT}@github.com/${TARGET_REPO} /tmp/target-repo
+          cd /tmp/target-repo
 
-      # Check if there's anything to commit
-      if git diff --cached --quiet; then
-        echo "No documentation changes detected. Skipping commit and PR."
-        exit 0
-      else
-        git commit -m "Update documentation build from $(date)"
-        git push origin $BRANCH_NAME
+          # Checkout production and update
+          git checkout production
+          git pull origin production
 
-        gh pr create --title "Update documentation build" \
-                     --body "This PR contains the latest documentation build updates." \
-                     --reviewer piinthecloud
-      fi
-  env:
-      DEPLOY_PAT: ${{ secrets.DEPLOY_PAT }}
-      GH_TOKEN: ${{ secrets.DEPLOY_PAT }}
-      TARGET_REPO: ${{ secrets.TARGET_REPO }}
+          # Create new branch
+          git checkout -b $BRANCH_NAME
+
+          # Git identity for commit
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+          # Copy built docs
+          mkdir -p plugins/docu-loader/docs-build
+          cp -r /tmp/source/docs/_docu-tools/build/* plugins/docu-loader/docs-build/
+
+          # Stage changes
+          git add plugins/docu-loader/docs-build/
+
+          # Check if there's anything to commit
+          if git diff --cached --quiet; then
+            echo "No documentation changes detected. Skipping commit and PR."
+            exit 0
+          else
+            git commit -m "Update documentation build from $(date)"
+            git push origin $BRANCH_NAME
+
+            gh pr create --title "Update documentation build" \
+                         --body "This PR contains the latest documentation build updates." \
+                         --reviewer piinthecloud
+          fi
+        env:
+          DEPLOY_PAT: ${{ secrets.DEPLOY_PAT }}
+          GH_TOKEN: ${{ secrets.DEPLOY_PAT }}
+          TARGET_REPO: ${{ secrets.TARGET_REPO }}
