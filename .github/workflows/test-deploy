@@ -1,0 +1,43 @@
+- name: Deploy docs to target repo
+  id: deploy
+  run: |
+      BRANCH_NAME="docs-build-$(date +'%Y%m%d-%H%M%S')"
+
+      # Clone target repo
+      git clone https://x-access-token:${DEPLOY_PAT}@github.com/${TARGET_REPO} /tmp/target-repo
+      cd /tmp/target-repo
+
+      # Checkout production and update
+      git checkout production
+      git pull origin production
+
+      # Create new branch
+      git checkout -b $BRANCH_NAME
+
+      # Git identity for commit
+      git config --global user.email "github-actions@github.com"
+      git config --global user.name "GitHub Actions"
+
+      # Copy built docs
+      mkdir -p plugins/docu-loader/docs-build
+      cp -r /tmp/source/docs/_docu-tools/build/* plugins/docu-loader/docs-build/
+
+      # Stage changes
+      git add plugins/docu-loader/docs-build/
+
+      # Check if there's anything to commit
+      if git diff --cached --quiet; then
+        echo "No documentation changes detected. Skipping commit and PR."
+        exit 0
+      else
+        git commit -m "Update documentation build from $(date)"
+        git push origin $BRANCH_NAME
+
+        gh pr create --title "Update documentation build" \
+                     --body "This PR contains the latest documentation build updates." \
+                     --reviewer piinthecloud
+      fi
+  env:
+      DEPLOY_PAT: ${{ secrets.DEPLOY_PAT }}
+      GH_TOKEN: ${{ secrets.DEPLOY_PAT }}
+      TARGET_REPO: ${{ secrets.TARGET_REPO }}
