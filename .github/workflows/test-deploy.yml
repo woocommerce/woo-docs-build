@@ -11,80 +11,40 @@ jobs:
       - name: Clone woocommerce repo (source)
         run: |
           git clone --branch=trunk https://github.com/woocommerce/woocommerce.git /tmp/source
-          ls -la /tmp/source/docs
 
-      # - name: Install dependencies and build docs
-      #   working-directory: /tmp/source/docs/_docu-tools
-      #   run: |
-      #     npm install
-      #     npm run deploy-build
+      - name: Check if /docs has changed
+        working-directory: /tmp/source
+        run: |
+          # Fetch the last commit hash from remote
+          git fetch origin trunk
+          PREV_COMMIT=$(git rev-parse HEAD~1)
+          echo "Comparing with previous commit: $PREV_COMMIT"
+
+          # Check for changes in the /docs folder
+          DOC_CHANGES=$(git diff --name-only $PREV_COMMIT HEAD -- docs/)
+
+          if [ -z "$DOC_CHANGES" ]; then
+            echo "No changes in /docs detected. Exiting."
+            exit 0
+          else
+            echo "Docs have changed:"
+            echo "$DOC_CHANGES"
+            echo "$DOC_CHANGES" > /tmp/changed-doc-files.txt
+          fi
 
       - name: Deploy docs to target repo
         run: |
-          BRANCH_NAME="docs-build-$(date +'%Y%m%d-%H%M%S')"
+          # Generate PR body from changed source files
+          PR_BODY="This PR contains documentation updates based on changes in the WooCommerce /docs directory.%0A%0A**Changed source files:**%0A"
+          while IFS= read -r file; do
+            PR_BODY+="%0A- \`${file}\`"
+          done < /tmp/changed-doc-files.txt
 
-          # Get list of changed files in WooCommerce /docs directory
-          cd /tmp/source
-          git fetch origin trunk
-          DOC_SOURCE_FILES=$(git diff --name-only HEAD~1 HEAD -- docs/)
+          # Preview PR body for testing
+          echo -e "🧪 Previewing PR body:\n"
+          echo -e "$PR_BODY"
 
-          # Clone target repo
-          git clone https://x-access-token:${DEPLOY_PAT}@github.com/${TARGET_REPO} /tmp/target-repo
-          cd /tmp/target-repo
 
-          # Checkout production and update
-          git checkout production
-          git pull origin production
-
-          # Create new branch
-          git checkout -b $BRANCH_NAME
-
-          # Git identity for commit
-          git config --global user.email "github-actions@github.com"
-          git config --global user.name "GitHub Actions"
-
-          # Copy built docs
-          mkdir -p plugins/docu-loader/docs-build
-          cp -r /tmp/source/docs/_docu-tools/build/* plugins/docu-loader/docs-build/
-
-          # Stage changes
-          git add plugins/docu-loader/docs-build/
-
-          # Check if there's anything to commit
-          if git diff --cached --quiet; then
-            echo "No documentation changes detected. Skipping commit and PR."
-            exit 0
-          else
-            # Get staged files (built files)
-            BUILT_DOC_FILES=$(git diff --name-only --cached)
-
-            # Construct PR body
-            PR_BODY="This PR contains the latest documentation build updates.\n\n"
-            PR_BODY+="**Changed source files in WooCommerce (/docs):**\n"
-            if [ -n "$DOC_SOURCE_FILES" ]; then
-              while IFS= read -r file; do
-                PR_BODY+="\n- \`${file}\`"
-              done <<< "$DOC_SOURCE_FILES"
-            else
-              PR_BODY+="\n_None detected_"
-            fi
-
-            PR_BODY+="\n\n**Updated built files in target repo:**\n"
-            while IFS= read -r file; do
-              PR_BODY+="\n- \`${file}\`"
-            done <<< "$BUILT_DOC_FILES"
-
-            # Preview PR body for testing
-            echo -e "🧪 Previewing PR body:\n"
-            echo -e "$PR_BODY"
-
-            # Uncomment below to enable PR creation
-            # git commit -m "Update documentation build from $(date)"
-            # git push origin $BRANCH_NAME
-            # gh pr create --title "Update documentation build" \
-            #              --body "$PR_BODY" \
-            #              --reviewer piinthecloud
-          fi
         env:
           DEPLOY_PAT: ${{ secrets.DEPLOY_PAT }}
           GH_TOKEN: ${{ secrets.DEPLOY_PAT }}
