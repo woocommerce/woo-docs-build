@@ -60,17 +60,20 @@ jobs:
             while IFS= read -r file; do
               PR_BODY+="%0A- \`${file}\`"
             done <<< "$CHANGED_FILES"
-            
-            # Create pull request with list of changed files
-            gh pr create --title "Update documentation build" \
-                         --body "$PR_BODY" \
-                         --reviewer piinthecloud
-            git commit -m "Update documentation build from $(date)"
-            git push origin $BRANCH_NAME
 
-            gh pr create --title "Update documentation build" \
-                         --body "This PR contains the latest documentation build updates." \
-                         --reviewer piinthecloud
+            echo -e "🧪 Previewing PR body:\n"
+            echo -e "$(printf "$PR_BODY" | sed 's/%0A/\\n/g')"
+            
+            # # Create pull request with list of changed files
+            # gh pr create --title "Update documentation build" \
+            #              --body "$PR_BODY" \
+            #              --reviewer piinthecloud
+            # git commit -m "Update documentation build from $(date)"
+            # git push origin $BRANCH_NAME
+
+            # gh pr create --title "Update documentation build" \
+            #              --body "This PR contains the latest documentation build updates." \
+            #              --reviewer piinthecloud
           fi
         env:
           DEPLOY_PAT: ${{ secrets.DEPLOY_PAT }}
